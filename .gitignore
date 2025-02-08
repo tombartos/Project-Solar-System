@@ -25,3 +25,7 @@ replay_pid*
 
 .vscode
 .editorconfig
+
+solarsystem/src/main/resources
+*.obj
+*.jpg
