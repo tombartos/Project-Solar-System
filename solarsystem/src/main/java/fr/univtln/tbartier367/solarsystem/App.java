@@ -1,14 +1,18 @@
 package fr.univtln.tbartier367.solarsystem;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.jme3.app.SimpleApplication;
-import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.texture.Texture;
+import com.jme3.export.binary.BinaryExporter;
 
 public class App extends SimpleApplication {
     private Planet earth;
@@ -32,17 +36,18 @@ public class App extends SimpleApplication {
      */
     public App(){
     }
-
+    
     @Override
     public void simpleInitApp() {
         //First we initialize the sun, it's not a planet because it's the only one to have the Unshaded material
-        Spatial sunSpatial = assetManager.loadModel("Models/sun.obj");
+        Spatial sunSpatial = assetManager.loadModel("Models/sun.j3o");
         Material sunMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         sunMaterial.setBoolean("ColorMap",true); 
         sunMaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/sun.jpg")); // with Lighting.j3md
         sunSpatial.setMaterial(sunMaterial); 
 
         sunSpatial.setLocalTranslation(0,0,0);
+        sunSpatial.setLocalScale(4,4,4);
         sunMaterial.setColor("GlowColor", ColorRGBA.Yellow);
         rootNode.attachChild(sunSpatial);
 
@@ -53,9 +58,12 @@ public class App extends SimpleApplication {
         rootNode.addLight(light);
 
         
-        earth = new Planet(assetManager, "Models/earth.obj", "Textures/earth.jpg");
-        earth.getSpatial().setLocalTranslation(0, 0, -10);
+        earth = new Planet(assetManager, "Models/earth.j3o", "Textures/earth.jpg");
+        earth.getSpatial().setLocalTranslation(0, 0, 60);
         rootNode.attachChild(earth.getSpatial());
+
+
+
     }
 
     @Override

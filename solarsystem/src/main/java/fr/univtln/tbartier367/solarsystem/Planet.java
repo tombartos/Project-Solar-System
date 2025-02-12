@@ -21,7 +21,7 @@ public class Planet {
         material.setColor("Diffuse", ColorRGBA.White);   // ... color of light being reflected
         material.setColor("Specular", ColorRGBA.White);
         material.setTexture("DiffuseMap", assetManager.loadTexture(texturePath)); // with Lighting.j3md
-        material.setFloat("Shininess", 8f); 
+        //material.setFloat("Shininess", 8f); 
         spatial.setMaterial(material);               
     }
 }
