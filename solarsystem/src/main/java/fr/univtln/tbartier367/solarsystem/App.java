@@ -1,9 +1,5 @@
 package fr.univtln.tbartier367.solarsystem;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.PointLight;
@@ -12,9 +8,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.export.binary.BinaryExporter;
 
 public class App extends SimpleApplication {
+    private Float time = 0f;
     private Planet earth;
 
     /**
@@ -58,8 +54,8 @@ public class App extends SimpleApplication {
         rootNode.addLight(light);
 
         
-        earth = new Planet(assetManager, "Models/earth.j3o", "Textures/earth.jpg");
-        earth.getSpatial().setLocalTranslation(0, 0, 60);
+        earth = Planet.factory(assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f, 60, 40);
+        //earth.getSpatial().setLocalTranslation(0, 0, 60);
         rootNode.attachChild(earth.getSpatial());
 
 
@@ -68,7 +64,19 @@ public class App extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-        // make the player rotate:
-        earth.getSpatial().rotate(0, 2*tpf, 0);
+      // Update the time parameter
+      time += tpf;
+      System.out.println(time);
+
+      // Update the Earth's position
+      //earth.getSpatial().setLocalTranslation(x, y, 0);
+
+
+      for (Planet p : Planet.getPlanetlist()) {
+        p.UpdatePosition(time);
+        //TODO: gerer les differentes rotations independemment
+        p.getSpatial().rotate(0, p.getRotationSpeed()*tpf, 0);
+    }
+
     }
 }

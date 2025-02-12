@@ -2,14 +2,9 @@ package fr.univtln.tbartier367.solarsystem.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
-
-import fr.univtln.tbartier367.solarsystem.App;
 
 import com.jme3.app.SimpleApplication;
 
