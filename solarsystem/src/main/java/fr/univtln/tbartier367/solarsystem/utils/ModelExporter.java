@@ -51,3 +51,5 @@ public class ModelExporter extends SimpleApplication {
             obj_to_j3o("Models/earth.obj", "ExportedModels/earth.j3o");
         }
 }
+
+
