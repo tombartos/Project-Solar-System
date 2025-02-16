@@ -8,7 +8,9 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -22,7 +24,6 @@ import com.jme3.input.controls.MouseButtonTrigger;
 public class App extends SimpleApplication {
     private Long time_multiplier = 1L;
     private Float time = 0f;
-    private Planet earth;
 
     /**
      * The main method.
@@ -48,27 +49,40 @@ public class App extends SimpleApplication {
     public void simpleInitApp() {
         flyCam.setMoveSpeed(25f);
         //First we initialize the sun, it's not a planet because it's the only one to have the Unshaded material
-        Spatial sunSpatial = assetManager.loadModel("Models/sun.j3o");
+        Sphere sunSphere = new Sphere(32, 32, 10);
+        Geometry sunSpatial = new Geometry("Sun", sunSphere);
         Material sunMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         sunMaterial.setBoolean("ColorMap",true); 
         sunMaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/sun.jpg")); // with Lighting.j3md
         sunSpatial.setMaterial(sunMaterial); 
 
         sunSpatial.setLocalTranslation(0,0,0);
-        sunSpatial.setLocalScale(4,4,4);
+        sunSpatial.setLocalScale(2);
         sunMaterial.setColor("GlowColor", ColorRGBA.Yellow);
         rootNode.attachChild(sunSpatial);
 
         PointLight light = new PointLight();
         light.setColor(ColorRGBA.White);
-        light.setRadius(9999999999f);
+        light.setRadius(99999999999999999999999999999999999999f);
         light.setPosition(new Vector3f(0, 0, 0));
         rootNode.addLight(light);
 
         
-        earth = Planet.factory(assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 60, 40);
-        //earth.getSpatial().setLocalTranslation(0, 0, 60);
+        Planet earth = Planet.factory(assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 149.598f, 0.0167f, 1f);
         rootNode.attachChild(earth.getSpatial());
+
+        Planet mars = Planet.factory(assetManager, "Models/mars.j3o", "Textures/mars.jpg", 0.9732f, 0.5317f, 227.956f, 0.0935f, 0.532f);
+        rootNode.attachChild(mars.getSpatial());
+
+        Planet jupiter = Planet.factory(assetManager, "Models/jupiter.j3o", "Textures/jupiter.jpg", 2.418f, 0.0842f, 778.479f, 0.0487f, 11.209f);
+        rootNode.attachChild(jupiter.getSpatial());
+
+        Planet mercury = Planet.factory(assetManager, "Models/mercury.j3o", "Textures/mercury.jpg", 0.0056f, 4.1954f, 57.909f, 0.2056f, 0.383f);
+        rootNode.attachChild(mercury.getSpatial());
+
+        Planet saturn = Planet.factory(assetManager, "Models/saturn.j3o", "Textures/saturn.jpg", 2.2522f, 0.0339f, 1432.041f, 0.0520f, 9.449f);
+        rootNode.attachChild(saturn.getSpatial());
+
         initKeys();
     }
 

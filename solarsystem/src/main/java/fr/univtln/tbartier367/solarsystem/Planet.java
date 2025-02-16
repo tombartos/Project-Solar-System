@@ -18,13 +18,14 @@ public class Planet {
     private Material material;
     private float semi_major;  //Semi-Major axis for ellipse
     private float semi_minor;  //Semi-Minor axis for ellipse
-    private float rotationSpeed;
-    private float revolutionSpeed;
+    private float rotationSpeed; //Scale from earth, 2 is 2x faster than earth
+    private float revolutionSpeed; //Same
+    private float size;            //same
     private float x = 0f;       //Position
     private float y = 0f;          
     private float z = 0f;
 
-    private Planet(AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor){
+    private Planet(AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size){
         spatial = assetManager.loadModel(modelPath);
         material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         material.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
@@ -36,8 +37,10 @@ public class Planet {
         spatial.setMaterial(material);
         semi_major = Semi_major;
         semi_minor = Semi_minor;
-        rotationSpeed = RotationSpeed;
-        revolutionSpeed = RevolutionSpeed;
+        rotationSpeed = RotationSpeed;      //Scalling based on earth, 2 = 2x faster than earth
+        revolutionSpeed = RevolutionSpeed;  //Same
+        size = Size;
+        spatial.setLocalScale(Size);
 
     }
 
@@ -45,8 +48,11 @@ public class Planet {
         return planetlist;
     }
 
-    public static Planet factory(AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed,float revolutionspeed, float Semi_major, float Semi_minor){
-        Planet planet = new Planet(assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor);
+    public static Planet factory(AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed, float revolutionspeed, float Semi_major, float eccentricity, float size){
+          //We calculate the semi minor from eccentricity because all the data the we can find only gives Semi Major and eccentricity
+          //But never the semi minor
+        float Semi_minor = Semi_major * (float) Math.sqrt(1 - eccentricity * eccentricity);
+        Planet planet = new Planet(assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor, size);
         planetlist.add(planet);
         return planet;
     }
