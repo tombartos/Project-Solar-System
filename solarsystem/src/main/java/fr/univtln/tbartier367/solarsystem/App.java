@@ -48,6 +48,7 @@ public class App extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         flyCam.setMoveSpeed(25f);
+        cam.setFrustumFar(10000f);
         //First we initialize the sun, it's not a planet because it's the only one to have the Unshaded material
         Sphere sunSphere = new Sphere(32, 32, 10);
         Geometry sunSpatial = new Geometry("Sun", sunSphere);
