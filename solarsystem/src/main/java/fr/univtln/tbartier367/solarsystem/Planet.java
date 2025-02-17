@@ -13,6 +13,7 @@ import lombok.Getter;
 @Getter
 public class Planet {
     private static List<Planet> planetlist = new ArrayList<>();
+    private String name;
     private AssetManager assetManager;
     private Spatial spatial;
     private Material material;
@@ -25,7 +26,8 @@ public class Planet {
     private float y = 0f;          
     private float z = 0f;
 
-    private Planet(AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size){
+    private Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size){
+        name = Name;
         spatial = assetManager.loadModel(modelPath);
         material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         material.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
@@ -48,24 +50,27 @@ public class Planet {
         return planetlist;
     }
 
-    public static Planet factory(AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed, float revolutionspeed, float Semi_major, float eccentricity, float size){
+    public static Planet factory(String name, AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed, float revolutionspeed, float Semi_major, float eccentricity, float size){
           //We calculate the semi minor from eccentricity because all the data the we can find only gives Semi Major and eccentricity
           //But never the semi minor
         float Semi_minor = Semi_major * (float) Math.sqrt(1 - eccentricity * eccentricity);
-        Planet planet = new Planet(assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor, size);
+        Planet planet = new Planet(name, assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor, size);
         planetlist.add(planet);
         return planet;
     }
 
     /**
      * Update the planet position depending on time
-     * @param time The current time of the simulation
+     * @param time The current time of the simulation in seconds
+     * @param Saturn_Rings A reference to the Saturn Rings Spatial
      */
 
-    public void UpdatePosition(float time){
+    public void UpdatePosition(float time, Spatial Saturn_Rings){
         x = semi_major * (float) Math.cos(time);
         y = semi_minor * (float) Math.sin(time);
         spatial.setLocalTranslation(x, y, z);
+        if (name.equals("Saturn"))
+            Saturn_Rings.setLocalTranslation(x,y,z);
     }
 
     
