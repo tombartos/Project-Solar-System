@@ -25,8 +25,9 @@ public class Planet {
     private float x = 0f;       //Position
     private float y = 0f;          
     private float z = 0f;
+    private ColorRGBA color;
 
-    private Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size){
+    private Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size, ColorRGBA Color){
         name = Name;
         spatial = assetManager.loadModel(modelPath);
         material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
@@ -42,6 +43,7 @@ public class Planet {
         rotationSpeed = RotationSpeed;      //Scalling based on earth, 2 = 2x faster than earth
         revolutionSpeed = RevolutionSpeed;  //Same
         size = Size;
+        color = Color;                      //Color of the trajectory line
         spatial.setLocalScale(Size);
 
     }
@@ -50,11 +52,11 @@ public class Planet {
         return planetlist;
     }
 
-    public static Planet factory(String name, AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed, float revolutionspeed, float Semi_major, float eccentricity, float size){
+    public static Planet factory(String name, AssetManager assetManager ,String modelPath, String texturePath, float rotationspeed, float revolutionspeed, float Semi_major, float eccentricity, float size, ColorRGBA color){
           //We calculate the semi minor from eccentricity because all the data the we can find only gives Semi Major and eccentricity
           //But never the semi minor
         float Semi_minor = Semi_major * (float) Math.sqrt(1 - eccentricity * eccentricity);
-        Planet planet = new Planet(name, assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor, size);
+        Planet planet = new Planet(name, assetManager, modelPath, texturePath, rotationspeed, revolutionspeed, Semi_major, Semi_minor, size, color);
         planetlist.add(planet);
         return planet;
     }
