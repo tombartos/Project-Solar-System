@@ -3,9 +3,7 @@ package fr.univtln.tbartier367.solarsystem;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
@@ -17,12 +15,8 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 
 public class App extends SimpleApplication {
     private Long time_multiplier = 1L;
@@ -49,9 +43,16 @@ public class App extends SimpleApplication {
     public App(){
     }
 
+    /**
+     * Adds a 2D line to the scene.
+     *
+     * @param p1    The starting point of the line as a Vector3f.
+     * @param p2    The ending point of the line as a Vector3f.
+     * @param color The color of the line as a ColorRGBA.
+     */
     public void add2DLine(Vector3f p1, Vector3f p2, ColorRGBA color){
         Line line = new Line(p1, p2);
-        line.setLineWidth(2);
+        //line.setLineWidth(2);
         Geometry geometry = new Geometry("Bullet", line);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", color);
@@ -59,7 +60,30 @@ public class App extends SimpleApplication {
         mat.getAdditionalRenderState().setFaceCullMode( RenderState.FaceCullMode.Off );
         geometry.setCullHint(Spatial.CullHint.Never);
         rootNode.attachChild(geometry);
-        
+    }
+
+    /**
+     * Draw the trajectory of the planet
+     * 
+     * @param planet the planet that you want the trajectory
+     */
+    public void drawTrajectory(Planet planet){
+        //It's not a Planet method beause we need to access to rootNode, we could give it in parameter
+        //But I prefer to just put the method here
+        float x = planet.getSemi_major();     //At the begining we start with cos(0)=1 and sin(0)=0;
+        float y = 0f;
+        float x2;
+        float y2;
+        ColorRGBA color = planet.getColor();
+
+        for(float i=0.05f; i<2*Math.PI; i+=0.01f){
+            x2 = x;
+            y2 = y;
+            x = planet.getSemi_major() * (float) Math.cos(i);
+            y = planet.getSemi_major() * (float) Math.sin(i);
+            add2DLine(new Vector3f(x,y,0), new Vector3f(x2,y2,0), color);
+        } 
+
     }
     
     @Override
@@ -114,10 +138,12 @@ public class App extends SimpleApplication {
         Saturn_Rings.setMaterial(mat_Saturn_Rings);
         Saturn_Rings.setLocalScale(8f);
         rootNode.attachChild(Saturn_Rings);
-        
-        initKeys();
 
-        
+        for (Planet p : Planet.getPlanetlist())
+            drawTrajectory(p);
+            
+
+        initKeys();
     }
 
     private void initKeys() {
@@ -177,8 +203,7 @@ public class App extends SimpleApplication {
       for (Planet p : Planet.getPlanetlist()) {
         p.UpdatePosition(time/31536000 *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre pour des multiplicateurs x1 sur la terre
         p.getSpatial().rotate(0, p.getRotationSpeed()*tpf*time_multiplier/86400, 0);
-    }
-        //TODO: Ecrire methode drawtraj
+        }
     }
 }
 

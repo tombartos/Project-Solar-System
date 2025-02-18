@@ -48,6 +48,11 @@ public class Planet {
 
     }
 
+    /**
+     * Returns the list of planets.
+     *
+     * @return a list of Planet objects.
+     */
     public static List<Planet> getPlanetlist() {
         return planetlist;
     }
@@ -60,9 +65,11 @@ public class Planet {
         planetlist.add(planet);
         return planet;
     }
+    
 
     /**
      * Update the planet position depending on time
+     * 
      * @param time The current time of the simulation in seconds
      * @param Saturn_Rings A reference to the Saturn Rings Spatial
      */
