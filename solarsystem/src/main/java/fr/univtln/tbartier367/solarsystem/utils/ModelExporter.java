@@ -30,9 +30,12 @@ public class ModelExporter extends SimpleApplication {
 
         /**
      * Exports the model model (path) from obj to j3o format and put it in the destination
-     * path. 
+     * path.
+     * @param model the path to the model from resources (includes file name)
+     * @param destination the destination path (includes file name)
      */
     public void obj_to_j3o(String model, String destination){
+        // I don't understand why the reading process is done from resources path but destination works as usual
         Spatial spatial = assetManager.loadModel(model);
         BinaryExporter exporter = BinaryExporter.getInstance();
         File file = new File(destination);
@@ -45,10 +48,10 @@ public class ModelExporter extends SimpleApplication {
         
     }
 
-
+    
         @Override
         public void simpleInitApp() {
-            obj_to_j3o("Models/rings.obj", "ExportedModels/rings.j3o");
+            obj_to_j3o("Models/phobos.obj", "ExportedModels/deimos.j3o");
         }
 }
 

@@ -12,22 +12,22 @@ import lombok.Getter;
 
 @Getter
 public class Planet {
-    private static List<Planet> planetlist = new ArrayList<>();
-    private String name;
-    private AssetManager assetManager;
-    private Spatial spatial;
-    private Material material;
-    private float semi_major;  //Semi-Major axis for ellipse
-    private float semi_minor;  //Semi-Minor axis for ellipse
-    private float rotationSpeed; //Scale from earth, 2 is 2x faster than earth
-    private float revolutionSpeed; //Same
-    private float size;            //same
-    private float x = 0f;       //Position
-    private float y = 0f;          
-    private float z = 0f;
-    private ColorRGBA color;
+    protected static List<Planet> planetlist = new ArrayList<>();
+    protected String name;
+    protected AssetManager assetManager;
+    protected Spatial spatial;
+    protected Material material;
+    protected float semi_major;  //Semi-Major axis for ellipse
+    protected float semi_minor;  //Semi-Minor axis for ellipse
+    protected float rotationSpeed; //Scale from earth, 2 is 2x faster than earth
+    protected float revolutionSpeed; //Same
+    protected float size;            //same
+    protected float x = 0f;       //Position
+    protected float y = 0f;          
+    protected float z = 0f;
+    protected ColorRGBA color;
 
-    private Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size, ColorRGBA Color){
+    protected Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size, ColorRGBA Color){
         name = Name;
         spatial = assetManager.loadModel(modelPath);
         material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
@@ -70,7 +70,7 @@ public class Planet {
     /**
      * Update the planet position depending on time
      * 
-     * @param time The current time of the simulation in seconds
+     * @param time The current time of the simulation in seconds already multiplied by the revolutionspeed
      * @param Saturn_Rings A reference to the Saturn Rings Spatial
      */
 

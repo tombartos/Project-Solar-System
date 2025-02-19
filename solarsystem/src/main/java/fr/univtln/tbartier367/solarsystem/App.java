@@ -76,7 +76,7 @@ public class App extends SimpleApplication {
         float y2;
         ColorRGBA color = planet.getColor();
 
-        for(float i=0.05f; i<2*Math.PI; i+=0.01f){
+        for(float i=0.05f; i<2*Math.PI+0.1f; i+=0.01f){
             x2 = x;
             y2 = y;
             x = planet.getSemi_major() * (float) Math.cos(i);
@@ -88,8 +88,9 @@ public class App extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
-        flyCam.setMoveSpeed(40f);
+        flyCam.setMoveSpeed(80f);
         cam.setFrustumFar(10000f);
+
         //First we initialize the sun, it's not a planet because it's the only one to have the Unshaded material
         Sphere sunSphere = new Sphere(32, 32, 10);
         Geometry sunSpatial = new Geometry("Sun", sunSphere);
@@ -103,13 +104,17 @@ public class App extends SimpleApplication {
         sunMaterial.setColor("GlowColor", ColorRGBA.Yellow);
         rootNode.attachChild(sunSpatial);
 
+        //Light in the sun
         PointLight light = new PointLight();
         light.setColor(ColorRGBA.White);
         light.setRadius(99999999999999999999999999999999999999f);
         light.setPosition(new Vector3f(0, 0, 0));
         rootNode.addLight(light);
 
-        
+        //Planets initialization
+        // Planet earth = Planet.factory("Earth", assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 149.598f, 0.0167f, 1f, ColorRGBA.Blue);
+        // rootNode.attachChild(earth.getSpatial());
+
         Planet earth = Planet.factory("Earth", assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 149.598f, 0.0167f, 1f, ColorRGBA.Blue);
         rootNode.attachChild(earth.getSpatial());
 
@@ -131,6 +136,7 @@ public class App extends SimpleApplication {
         Planet neptune = Planet.factory("Neptune", assetManager, "Models/saturn.j3o", "Textures/neptune.jpg", 1.4897f, 0.0061f, 4514.953f, 0.0097f, 3.883f, ColorRGBA.Blue);
         rootNode.attachChild(neptune.getSpatial());
 
+        //Rings of Saturn, there is a problem with the texture loading
         Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
         Material mat_Saturn_Rings = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat_Saturn_Rings.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off); // Make the rings double-sided
@@ -139,9 +145,26 @@ public class App extends SimpleApplication {
         Saturn_Rings.setLocalScale(8f);
         rootNode.attachChild(Saturn_Rings);
 
+        //Trajectory lines for planets
         for (Planet p : Planet.getPlanetlist())
             drawTrajectory(p);
-            
+
+        //Moons initialization
+        Moon moon = Moon.factory("Moon", assetManager, "Models/moon.j3o", "Textures/moon.jpg", 0.878f, 13.5185f, 0.3844f, 0.0549f, 0.2725f, ColorRGBA.Gray, earth, 25f);
+        rootNode.attachChild(moon.getSpatial());
+
+        Moon phobos = Moon.factory("Phobos", assetManager, "Models/phobos.j3o", "Textures/phobos.jpg", 4f*mars.getRotationSpeed(), 1215f, 0.009376f, 0.0151f, 0.05f, ColorRGBA.Brown, mars, 500f);
+        rootNode.attachChild(phobos.getSpatial());
+
+        Moon deimos = Moon.factory("Deimos", assetManager, "Models/deimos.j3o", "Textures/deimos.jpg", 4f*mars.getRotationSpeed(), 311f, 0.0235f, 0.0002f, 0.05f, ColorRGBA.Brown, mars, 500f);
+        rootNode.attachChild(deimos.getSpatial());
+
+        Moon io = Moon.factory("Io", assetManager, "Models/saturn.j3o", "Textures/io.jpg", 4f*jupiter.getRotationSpeed(), 421.7f, 0.0028f, 0.0041f, 0.286f, ColorRGBA.Yellow, jupiter, 10000f);
+        rootNode.attachChild(io.getSpatial());
+
+        Moon europa = Moon.factory("Europa", assetManager, "Models/saturn.j3o", "Textures/europa.jpg", 4f*jupiter.getRotationSpeed(), 210f, 0.0094f, 0.001f, 0.245f, ColorRGBA.White, jupiter, 10000f);
+        rootNode.attachChild(europa.getSpatial());
+
 
         initKeys();
     }
@@ -194,14 +217,10 @@ public class App extends SimpleApplication {
     public void simpleUpdate(float tpf) {
       // Update the time parameter (this is in seconds)
       time +=  tpf*time_multiplier;
-      System.out.println(time);
-
-      // Update the Earth's position
-      //earth.getSpatial().setLocalTranslation(x, y, 0);
-
+      //System.out.println(time);
 
       for (Planet p : Planet.getPlanetlist()) {
-        p.UpdatePosition(time/31536000 *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre pour des multiplicateurs x1 sur la terre
+        p.UpdatePosition(time/31536000 *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre (en secondes) pour des multiplicateurs x1 sur la terre
         p.getSpatial().rotate(0, p.getRotationSpeed()*tpf*time_multiplier/86400, 0);
         }
     }
