@@ -51,7 +51,7 @@ public class ModelExporter extends SimpleApplication {
     
         @Override
         public void simpleInitApp() {
-            obj_to_j3o("Models/phobos.obj", "ExportedModels/deimos.j3o");
+            obj_to_j3o("Models/asteroids.obj", "ExportedModels/asteroids.j3o");
         }
 }
 

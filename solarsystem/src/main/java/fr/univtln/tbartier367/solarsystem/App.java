@@ -1,6 +1,9 @@
 package fr.univtln.tbartier367.solarsystem;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
@@ -85,6 +88,39 @@ public class App extends SimpleApplication {
         } 
 
     }
+
+
+    /**
+    * Initializes the Kuiper Belt
+    * 
+    * @param semi_minor The semi minor axis of the belt
+    * @param semi_major The semi major axis of the belt
+    */
+    public List<Spatial> init_KuiperBelt(float semi_minor, float semi_major){
+            //Kuiper Belt
+            float x;
+            float y;
+            Material asteroids_mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");  //Same texture for all asteroids
+            asteroids_mat.setBoolean("UseMaterialColors",true); 
+            asteroids_mat.setColor("Ambient", ColorRGBA.White);   
+            asteroids_mat.setColor("Diffuse", ColorRGBA.White);   
+            asteroids_mat.setColor("Specular", ColorRGBA.White);
+            asteroids_mat.setTexture("DiffuseMap", assetManager.loadTexture("/Textures/asteroids.jpeg"));
+            
+            List<Spatial> asteroids_list = new ArrayList<>();         //We make a list to avoid losing access to asteroids
+            for(float i = 0; i<2*Math.PI; i+=0.04f){
+                //System.out.print(" CPT = "+cpt);
+                x = semi_major * (float) Math.cos(i);
+                y = semi_minor * (float) Math.sin(i);
+                Spatial tmp = assetManager.loadModel("/Models/asteroids.j3o");
+                tmp.setMaterial(asteroids_mat);
+                tmp.setLocalTranslation(x, y, 0);
+                tmp.setLocalScale(8);
+                asteroids_list.add(tmp);
+                rootNode.attachChild(tmp);                
+            }
+            return asteroids_list;
+    }
     
     @Override
     public void simpleInitApp() {
@@ -165,6 +201,8 @@ public class App extends SimpleApplication {
         Moon europa = Moon.factory("Europa", assetManager, "Models/saturn.j3o", "Textures/europa.jpg", 4f*jupiter.getRotationSpeed(), 210f, 0.0094f, 0.001f, 0.245f, ColorRGBA.White, jupiter, 10000f);
         rootNode.attachChild(europa.getSpatial());
 
+        //Kuiper Belt Initialization
+        List<Spatial> asteroids_List = init_KuiperBelt(neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f);
 
         initKeys();
     }

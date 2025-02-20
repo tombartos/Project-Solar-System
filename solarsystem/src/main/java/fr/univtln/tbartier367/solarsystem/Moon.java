@@ -34,9 +34,9 @@ public class Moon extends Planet {
     float centerY = attachedPlanet.y;
     float centerZ = attachedPlanet.z;
     
-    x = centerX + semi_major * (float) Math.cos(time);
+    x = centerX + semi_major * (float) Math.cos(-time);
     y = centerY;
-    z = centerZ + semi_minor * (float) Math.sin(time);
+    z = centerZ + semi_minor * (float) Math.sin(-time);
     spatial.setLocalTranslation(x, y, z);
     }
 
