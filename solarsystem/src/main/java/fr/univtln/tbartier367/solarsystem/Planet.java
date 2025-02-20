@@ -5,8 +5,14 @@ import java.util.List;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Line;
+
 import lombok.Getter;
 
 
@@ -26,6 +32,8 @@ public class Planet {
     protected float y = 0f;          
     protected float z = 0f;
     protected ColorRGBA color;
+    protected List<Material> mat_traj_List = new ArrayList<>(); //Not sure if this one will be used
+    protected List<Geometry> geo_traj_List = new ArrayList<>();
 
     protected Planet(String Name, AssetManager assetManager ,String modelPath, String texturePath, float RotationSpeed, float RevolutionSpeed, float Semi_major, float Semi_minor, float Size, ColorRGBA Color){
         name = Name;
@@ -81,6 +89,36 @@ public class Planet {
         if (name.equals("Saturn"))
             Saturn_Rings.setLocalTranslation(x,y,z);
     }
+
+    /**
+     * Draw the trajectory of the planet
+     * 
+     */
+    public void drawTrajectory(Node rootNode, AssetManager assetManager){
+        float local_x = semi_major;     //At the begining we start with cos(0)=1 and sin(0)=0;
+        float local_y = 0f;
+        float x2;
+        float y2;
+
+        for(float i=0.05f; i<2*Math.PI+0.05f; i+=0.01f){
+            x2 = local_x;
+            y2 = local_y;
+            local_x = semi_major * (float) Math.cos(i);
+            local_y = semi_minor * (float) Math.sin(i);
+            Line line = new Line(new Vector3f(local_x,local_y,0), new Vector3f(x2,y2,0));
+            Geometry geometry = new Geometry("Bullet", line);
+            Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            mat.setColor("Color", color);
+            geometry.setMaterial(mat);
+            mat.getAdditionalRenderState().setFaceCullMode( RenderState.FaceCullMode.Off );
+            mat_traj_List.add(mat);         //Not sure if it will be used
+            geometry.setCullHint(Spatial.CullHint.Never);
+            geo_traj_List.add(geometry);
+            rootNode.attachChild(geometry);
+        } 
+
+    }
+
 
     
 }

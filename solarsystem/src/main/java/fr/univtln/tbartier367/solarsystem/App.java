@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Line;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
+import com.jme3.util.SkyFactory;
+
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.input.controls.ActionListener;
@@ -25,6 +26,8 @@ public class App extends SimpleApplication {
     private Long time_multiplier = 1L;
     private Float time = 0f;
     private Spatial Saturn_Rings;
+    private BitmapText speedText;
+    private boolean showTrajectories = true;
 
     /**
      * The main method.
@@ -44,49 +47,6 @@ public class App extends SimpleApplication {
      * The default constructor. 
      */
     public App(){
-    }
-
-    /**
-     * Adds a 2D line to the scene.
-     *
-     * @param p1    The starting point of the line as a Vector3f.
-     * @param p2    The ending point of the line as a Vector3f.
-     * @param color The color of the line as a ColorRGBA.
-     */
-    public void add2DLine(Vector3f p1, Vector3f p2, ColorRGBA color){
-        Line line = new Line(p1, p2);
-        //line.setLineWidth(2);
-        Geometry geometry = new Geometry("Bullet", line);
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", color);
-        geometry.setMaterial(mat);
-        mat.getAdditionalRenderState().setFaceCullMode( RenderState.FaceCullMode.Off );
-        geometry.setCullHint(Spatial.CullHint.Never);
-        rootNode.attachChild(geometry);
-    }
-
-    /**
-     * Draw the trajectory of the planet
-     * 
-     * @param planet the planet that you want the trajectory
-     */
-    public void drawTrajectory(Planet planet){
-        //It's not a Planet method beause we need to access to rootNode, we could give it in parameter
-        //But I prefer to just put the method here
-        float x = planet.getSemi_major();     //At the begining we start with cos(0)=1 and sin(0)=0;
-        float y = 0f;
-        float x2;
-        float y2;
-        ColorRGBA color = planet.getColor();
-
-        for(float i=0.05f; i<2*Math.PI+0.1f; i+=0.01f){
-            x2 = x;
-            y2 = y;
-            x = planet.getSemi_major() * (float) Math.cos(i);
-            y = planet.getSemi_major() * (float) Math.sin(i);
-            add2DLine(new Vector3f(x,y,0), new Vector3f(x2,y2,0), color);
-        } 
-
     }
 
 
@@ -124,9 +84,30 @@ public class App extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
+        //Camera config
         flyCam.setMoveSpeed(80f);
         cam.setFrustumFar(10000f);
 
+        //HUD config
+        setDisplayStatView(false);
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        speedText= new BitmapText(guiFont);
+        speedText.setSize(guiFont.getCharSet().getRenderedSize());
+        speedText.setText("Speed : "+time_multiplier);
+        speedText.setLocalTranslation(300, speedText.getLineHeight(), 0);
+        guiNode.attachChild(speedText);
+
+         // Sky texture using six images
+        Spatial sky = SkyFactory.createSky(
+        assetManager,
+        assetManager.loadTexture("Textures/skybox/right.png"),
+        assetManager.loadTexture("Textures/skybox/left.png"),
+        assetManager.loadTexture("Textures/skybox/front.png"),
+        assetManager.loadTexture("Textures/skybox/back.png"),
+        assetManager.loadTexture("Textures/skybox/top.png"),
+        assetManager.loadTexture("Textures/skybox/bottom.png")
+        );
+        rootNode.attachChild(sky);
         //First we initialize the sun, it's not a planet because it's the only one to have the Unshaded material
         Sphere sunSphere = new Sphere(32, 32, 10);
         Geometry sunSpatial = new Geometry("Sun", sunSphere);
@@ -183,7 +164,7 @@ public class App extends SimpleApplication {
 
         //Trajectory lines for planets
         for (Planet p : Planet.getPlanetlist())
-            drawTrajectory(p);
+            p.drawTrajectory(rootNode, assetManager);
 
         //Moons initialization
         Moon moon = Moon.factory("Moon", assetManager, "Models/moon.j3o", "Textures/moon.jpg", 0.878f, 13.5185f, 0.3844f, 0.0549f, 0.2725f, ColorRGBA.Gray, earth, 25f);
@@ -202,26 +183,32 @@ public class App extends SimpleApplication {
         rootNode.attachChild(europa.getSpatial());
 
         //Kuiper Belt Initialization
-        List<Spatial> asteroids_List = init_KuiperBelt(neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f);
+        List<Spatial> asteroids_List = init_KuiperBelt(neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f); //Not sure if the list will be used
 
+        
+        
         initKeys();
     }
 
     private void initKeys() {
-    /* You can map one or several inputs to one named mapping. */
-    inputManager.addMapping("TimeFaster",  new KeyTrigger(KeyInput.KEY_P));
-    inputManager.addMapping("TimeSlower",  new KeyTrigger(KeyInput.KEY_O));
+        /* You can map one or several inputs to one named mapping. */
+        inputManager.addMapping("TimeFaster",  new KeyTrigger(KeyInput.KEY_P));
+        inputManager.addMapping("TimeSlower",  new KeyTrigger(KeyInput.KEY_O));
+        inputManager.addMapping("ShowTrajectories", new KeyTrigger(KeyInput.KEY_T));
 
-    /* Add the named mappings to the action listeners. */
-    inputManager.addListener(actionListener, "TimeFaster", "TimeSlower");
-
+        /* Add the named mappings to the action listeners. */
+        inputManager.addListener(actionListener, "TimeFaster", "TimeSlower", "ShowTrajectories");
     }
 
-      /** Use this listener for KeyDown/KeyUp events */
-      final private ActionListener actionListener = new ActionListener() {
+    /** Use this listener for KeyDown/KeyUp events */
+    final private ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("TimeFaster")){
+            if (name.equals("TimeFaster") && !keyPressed){
+                if (time_multiplier == 6103515625L){
+                    speedText.setText("Speed = " + time_multiplier + " Max Speed");
+                    return;
+                }
                 if (time_multiplier < 0L){
                     if (time_multiplier == -1L)
                         time_multiplier = 1L;
@@ -230,9 +217,14 @@ public class App extends SimpleApplication {
                 }
                 else
                     time_multiplier*=5L;
+                speedText.setText("Speed : "+time_multiplier);
             }
 
-            if (name.equals("TimeSlower")){
+            if (name.equals("TimeSlower")&& !keyPressed){
+                if (time_multiplier == -6103515625L){
+                    speedText.setText("Speed = " + time_multiplier + " Max Speed");
+                    return;
+                }
                 if (time_multiplier >0L){
                     if (time_multiplier == 1L)
                         time_multiplier = -1L;
@@ -241,8 +233,27 @@ public class App extends SimpleApplication {
                 }
                 else
                     time_multiplier *= 5L;
+                speedText.setText("Speed : "+time_multiplier);
             }
-        }   
+            if (name.equals("ShowTrajectories") && !keyPressed){
+                if (showTrajectories){          //Hide trajectories
+                    showTrajectories = false;
+                    for (Planet p : Planet.getPlanetlist()) {
+                        for(Geometry geo: p.getGeo_traj_List()){
+                            geo.setCullHint(Spatial.CullHint.Always);
+                        }
+                    }
+                }
+                else {      //Show trajectories
+                    showTrajectories = true;   
+                    for (Planet p : Planet.planetlist) {
+                        for(Geometry geo: p.getGeo_traj_List()){
+                            geo.setCullHint(Spatial.CullHint.Never);
+                        }
+                    }
+                }
+            }
+        }
     };
 
     final private AnalogListener analogListener = new AnalogListener() {
