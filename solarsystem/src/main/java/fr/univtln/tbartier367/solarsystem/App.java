@@ -5,19 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
+import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.util.SkyFactory;
 
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
@@ -28,6 +36,8 @@ public class App extends SimpleApplication {
     private Spatial Saturn_Rings;
     private BitmapText speedText;
     private boolean showTrajectories = true;
+    private ChaseCamera chaseCam;
+    private Node planets = new Node();
 
     /**
      * The main method.
@@ -84,9 +94,7 @@ public class App extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
-        //Camera config
-        flyCam.setMoveSpeed(80f);
-        cam.setFrustumFar(10000f);
+        rootNode.attachChild(planets);
 
         //HUD config
         setDisplayStatView(false);
@@ -119,7 +127,7 @@ public class App extends SimpleApplication {
         sunSpatial.setLocalTranslation(0,0,0);
         sunSpatial.setLocalScale(2);
         sunMaterial.setColor("GlowColor", ColorRGBA.Yellow);
-        rootNode.attachChild(sunSpatial);
+        planets.attachChild(sunSpatial);
 
         //Light in the sun
         PointLight light = new PointLight();
@@ -129,29 +137,28 @@ public class App extends SimpleApplication {
         rootNode.addLight(light);
 
         //Planets initialization
-        // Planet earth = Planet.factory("Earth", assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 149.598f, 0.0167f, 1f, ColorRGBA.Blue);
-        // rootNode.attachChild(earth.getSpatial());
-
         Planet earth = Planet.factory("Earth", assetManager, "Models/earth.j3o", "Textures/earth.jpg", 1f,1f, 149.598f, 0.0167f, 1f, ColorRGBA.Blue);
-        rootNode.attachChild(earth.getSpatial());
+        planets.attachChild(earth.getSpatial());
 
         Planet mars = Planet.factory("Mars", assetManager, "Models/mars.j3o", "Textures/mars.jpg", 0.9732f, 0.5317f, 227.956f, 0.0935f, 0.532f, ColorRGBA.Red);
-        rootNode.attachChild(mars.getSpatial());
+        planets.attachChild(mars.getSpatial());
 
         Planet jupiter = Planet.factory("Jupiter", assetManager, "Models/jupiter.j3o", "Textures/jupiter.jpg", 2.418f, 0.0842f, 778.479f, 0.0487f, 11.209f, ColorRGBA.Brown);
-        rootNode.attachChild(jupiter.getSpatial());
+        planets.attachChild(jupiter.getSpatial());
 
         Planet mercury = Planet.factory("Mercury", assetManager, "Models/mercury.j3o", "Textures/mercury.jpg", 0.0056f, 4.1954f, 57.909f, 0.2056f, 0.383f, ColorRGBA.Gray);
-        rootNode.attachChild(mercury.getSpatial());
+        planets.attachChild(mercury.getSpatial());
 
         Planet saturn = Planet.factory("Saturn", assetManager, "Models/saturn.j3o", "Textures/saturn.jpg", 2.2522f, 0.0339f, 1432.041f, 0.0520f, 9.449f, ColorRGBA.Orange);
-        rootNode.attachChild(saturn.getSpatial());
+        planets.attachChild(saturn.getSpatial());
 
         Planet uranus = Planet.factory("Uranus", assetManager, "Models/saturn.j3o", "Textures/uranus.jpg", 1.4117f, 0.0119f, 2867.043f, 0.0469f, 4.007f, ColorRGBA.Cyan); //Same model than Saturn, it's just a sphere
-        rootNode.attachChild(uranus.getSpatial());
+        planets.attachChild(uranus.getSpatial());
 
         Planet neptune = Planet.factory("Neptune", assetManager, "Models/saturn.j3o", "Textures/neptune.jpg", 1.4897f, 0.0061f, 4514.953f, 0.0097f, 3.883f, ColorRGBA.Blue);
-        rootNode.attachChild(neptune.getSpatial());
+        planets.attachChild(neptune.getSpatial());
+        System.err.println(neptune.getSpatial().getName());
+
 
         //Rings of Saturn, there is a problem with the texture loading
         Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
@@ -168,24 +175,33 @@ public class App extends SimpleApplication {
 
         //Moons initialization
         Moon moon = Moon.factory("Moon", assetManager, "Models/moon.j3o", "Textures/moon.jpg", 0.878f, 13.5185f, 0.3844f, 0.0549f, 0.2725f, ColorRGBA.Gray, earth, 25f);
-        rootNode.attachChild(moon.getSpatial());
+        planets.attachChild(moon.getSpatial());
 
         Moon phobos = Moon.factory("Phobos", assetManager, "Models/phobos.j3o", "Textures/phobos.jpg", 4f*mars.getRotationSpeed(), 1215f, 0.009376f, 0.0151f, 0.05f, ColorRGBA.Brown, mars, 500f);
-        rootNode.attachChild(phobos.getSpatial());
+        planets.attachChild(phobos.getSpatial());
 
         Moon deimos = Moon.factory("Deimos", assetManager, "Models/deimos.j3o", "Textures/deimos.jpg", 4f*mars.getRotationSpeed(), 311f, 0.0235f, 0.0002f, 0.05f, ColorRGBA.Brown, mars, 500f);
-        rootNode.attachChild(deimos.getSpatial());
+        planets.attachChild(deimos.getSpatial());
 
         Moon io = Moon.factory("Io", assetManager, "Models/saturn.j3o", "Textures/io.jpg", 4f*jupiter.getRotationSpeed(), 421.7f, 0.0028f, 0.0041f, 0.286f, ColorRGBA.Yellow, jupiter, 10000f);
-        rootNode.attachChild(io.getSpatial());
+        planets.attachChild(io.getSpatial());
 
         Moon europa = Moon.factory("Europa", assetManager, "Models/saturn.j3o", "Textures/europa.jpg", 4f*jupiter.getRotationSpeed(), 210f, 0.0094f, 0.001f, 0.245f, ColorRGBA.White, jupiter, 10000f);
-        rootNode.attachChild(europa.getSpatial());
+        planets.attachChild(europa.getSpatial());
+
 
         //Kuiper Belt Initialization
         List<Spatial> asteroids_List = init_KuiperBelt(neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f); //Not sure if the list will be used
 
-        
+        //Camera Initialization
+        flyCam.setEnabled(false);
+        cam.setFrustumFar(10000f);
+        chaseCam = new ChaseCamera(cam, sunSpatial, inputManager);
+        chaseCam.setDefaultDistance(500);
+        chaseCam.setMaxDistance(4000);
+        chaseCam.setDefaultHorizontalRotation(-FastMath.PI/2);
+        chaseCam.setMinVerticalRotation(-FastMath.PI/2-0.01f);
+        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); // Only right mouse button
         
         initKeys();
     }
@@ -195,9 +211,10 @@ public class App extends SimpleApplication {
         inputManager.addMapping("TimeFaster",  new KeyTrigger(KeyInput.KEY_P));
         inputManager.addMapping("TimeSlower",  new KeyTrigger(KeyInput.KEY_O));
         inputManager.addMapping("ShowTrajectories", new KeyTrigger(KeyInput.KEY_T));
+        inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 
         /* Add the named mappings to the action listeners. */
-        inputManager.addListener(actionListener, "TimeFaster", "TimeSlower", "ShowTrajectories");
+        inputManager.addListener(actionListener, "TimeFaster", "TimeSlower", "ShowTrajectories", "Select");
     }
 
     /** Use this listener for KeyDown/KeyUp events */
@@ -235,6 +252,7 @@ public class App extends SimpleApplication {
                     time_multiplier *= 5L;
                 speedText.setText("Speed : "+time_multiplier);
             }
+            
             if (name.equals("ShowTrajectories") && !keyPressed){
                 if (showTrajectories){          //Hide trajectories
                     showTrajectories = false;
@@ -252,6 +270,16 @@ public class App extends SimpleApplication {
                         }
                     }
                 }
+            }
+            if (name.equals("Select") && !keyPressed){
+                 // 1. Reset results list.
+                CollisionResults results = new CollisionResults();
+                // 2. Aim the ray
+                Vector2f cursor = inputManager.getCursorPosition();
+                Ray ray = new Ray(cam.getLocation(), new Vector3f(cursor.getX(), cursor.getY(), cam.getDirection().z)); //Pas sur a tester
+                // 3. Collect intersections between Ray and Shootables in results list.
+                planets.collideWith(ray, results);
+                //TODO: tester et continuer
             }
         }
     };
