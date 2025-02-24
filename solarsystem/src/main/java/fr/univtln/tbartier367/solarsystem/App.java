@@ -20,6 +20,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
+import com.jme3.terrain.noise.Color;
 import com.jme3.util.SkyFactory;
 
 import com.jme3.math.ColorRGBA;
@@ -157,7 +158,9 @@ public class App extends SimpleApplication {
 
         Planet neptune = Planet.factory("Neptune", assetManager, "Models/saturn.j3o", "Textures/neptune.jpg", 1.4897f, 0.0061f, 4514.953f, 0.0097f, 3.883f, ColorRGBA.Blue);
         planets.attachChild(neptune.getSpatial());
-        System.err.println(neptune.getSpatial().getName());
+
+        Planet venus = Planet.factory("Venus", assetManager, "Models/saturn.j3o", "Textures/venus.jpg", 0.00856f, 1.6255f, 108.210f, 0.0068f, 0.949f, ColorRGBA.Brown);
+        planets.attachChild(venus.getSpatial());
 
 
         //Rings of Saturn, there is a problem with the texture loading
@@ -174,7 +177,7 @@ public class App extends SimpleApplication {
             p.drawTrajectory(rootNode, assetManager);
 
         //Moons initialization
-        Moon moon = Moon.factory("Moon", assetManager, "Models/moon.j3o", "Textures/moon.jpg", 0.878f, 13.5185f, 0.3844f, 0.0549f, 0.2725f, ColorRGBA.Gray, earth, 25f);
+        Moon moon = Moon.factory("Moon", assetManager, "Models/moon.j3o", "Textures/moon.jpg", 0.878f, 13.5185f, 0.3844f, 0.0549f, 0.2f, ColorRGBA.Gray, earth, 25f);
         planets.attachChild(moon.getSpatial());
 
         Moon phobos = Moon.factory("Phobos", assetManager, "Models/phobos.j3o", "Textures/phobos.jpg", 4f*mars.getRotationSpeed(), 1215f, 0.009376f, 0.0151f, 0.05f, ColorRGBA.Brown, mars, 500f);
@@ -276,9 +279,13 @@ public class App extends SimpleApplication {
                 CollisionResults results = new CollisionResults();
                 // 2. Aim the ray
                 Vector2f cursor = inputManager.getCursorPosition();
+                Vector3f camvec = cam.getDirection(); //CONTINUER POUR FAIRE UNE ORTATION PAR RAPPORT AU CURSEUR
                 Ray ray = new Ray(cam.getLocation(), new Vector3f(cursor.getX(), cursor.getY(), cam.getDirection().z)); //Pas sur a tester
                 // 3. Collect intersections between Ray and Shootables in results list.
                 planets.collideWith(ray, results);
+                System.out.println("----- Collisions? " + results.size() + "-----");
+                // String hit = results.getCollision(0).getGeometry().getName();
+                // System.out.println(hit);
                 //TODO: tester et continuer
             }
         }
