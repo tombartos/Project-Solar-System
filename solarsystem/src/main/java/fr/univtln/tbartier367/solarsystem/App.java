@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
@@ -20,7 +21,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
-import com.jme3.terrain.noise.Color;
 import com.jme3.util.SkyFactory;
 
 import com.jme3.math.ColorRGBA;
@@ -28,6 +28,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 
@@ -60,6 +61,12 @@ public class App extends SimpleApplication {
     public App(){
     }
 
+    //Methode de Audouard Florian
+    private static Vector3f getClickDirection(Camera cam, Vector2f screenPos) {
+        Vector3f worldCoords = cam.getWorldCoordinates(screenPos, 0f).clone();
+        Vector3f direction = worldCoords.subtract(cam.getLocation()).normalize();
+        return direction;
+    }
 
     /**
     * Initializes the Kuiper Belt
@@ -67,7 +74,7 @@ public class App extends SimpleApplication {
     * @param semi_minor The semi minor axis of the belt
     * @param semi_major The semi major axis of the belt
     */
-    public List<Spatial> init_KuiperBelt(float semi_minor, float semi_major){
+    private static List<Spatial> init_KuiperBelt(AssetManager assetManager, Node rootNode, float semi_minor, float semi_major){
             //Kuiper Belt
             float x;
             float y;
@@ -194,7 +201,7 @@ public class App extends SimpleApplication {
 
 
         //Kuiper Belt Initialization
-        List<Spatial> asteroids_List = init_KuiperBelt(neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f); //Not sure if the list will be used
+        List<Spatial> asteroids_List = init_KuiperBelt(assetManager, rootNode, neptune.getSemi_minor()*1.2f, neptune.getSemi_major()*1.2f); //Not sure if the list will be used
 
         //Camera Initialization
         flyCam.setEnabled(false);
@@ -279,14 +286,18 @@ public class App extends SimpleApplication {
                 CollisionResults results = new CollisionResults();
                 // 2. Aim the ray
                 Vector2f cursor = inputManager.getCursorPosition();
-                Vector3f camvec = cam.getDirection(); //CONTINUER POUR FAIRE UNE ORTATION PAR RAPPORT AU CURSEUR
-                Ray ray = new Ray(cam.getLocation(), new Vector3f(cursor.getX(), cursor.getY(), cam.getDirection().z)); //Pas sur a tester
+                Ray ray = new Ray(cam.getLocation(), getClickDirection(cam, cursor)); //Pas sur a tester
                 // 3. Collect intersections between Ray and Shootables in results list.
                 planets.collideWith(ray, results);
                 System.out.println("----- Collisions? " + results.size() + "-----");
-                // String hit = results.getCollision(0).getGeometry().getName();
-                // System.out.println(hit);
-                //TODO: tester et continuer
+                if(results.size()>0){
+                    Geometry hit = results.getCollision(0).getGeometry();
+                    for(Planet p: Planet.planetlist){
+                        Spatial tmp = p.getSpatial();
+                        if(hit.equals(tmp))
+                            chaseCam.setSpatial(tmp);
+                    }
+                }
             }
         }
     };
