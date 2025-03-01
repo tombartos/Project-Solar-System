@@ -28,6 +28,20 @@
   <dependencies>
 
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.1.0-alpha1</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
+      <version>3.0.24</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>com.simsilica</groupId>
       <artifactId>lemur</artifactId>
       <version>1.16.0</version>

@@ -22,7 +22,10 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.util.SkyFactory;
-
+import com.simsilica.lemur.Container;
+import com.simsilica.lemur.GuiGlobals;
+import com.simsilica.lemur.Label;
+import com.simsilica.lemur.style.BaseStyles;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
@@ -33,13 +36,17 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 
 public class App extends SimpleApplication {
-    private Long time_multiplier = 1L;
-    private Float time = 0f;
-    private Spatial Saturn_Rings;
-    private BitmapText speedText;
-    private boolean showTrajectories = true;
-    private ChaseCamera chaseCam;
-    private Node planets = new Node();
+    private static final int RES_WIDTH = 1920;
+    private static final int RES_HEIGHT = 1080;
+    private static Long time_multiplier = 1L;
+    private static Float time = 0f;
+    private static Spatial Saturn_Rings;
+    private static BitmapText speedText;
+    private static boolean showTrajectories = true;
+    private static ChaseCamera chaseCam;
+    private static Node planets = new Node();
+   
+
 
     /**
      * The main method.
@@ -47,8 +54,9 @@ public class App extends SimpleApplication {
      */
     public static void main(String[] args){
         
-        AppSettings settings=new AppSettings(true);
-        settings.setWindowSize(1280, 720);
+        AppSettings settings = new AppSettings(true);
+        settings.setResolution(RES_WIDTH, RES_HEIGHT);
+        settings.setFullscreen(true);
         App app = new App();
         app.setShowSettings(false);
         app.setSettings(settings);
@@ -213,6 +221,24 @@ public class App extends SimpleApplication {
         chaseCam.setMinVerticalRotation(-FastMath.PI/2-0.01f);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); // Only right mouse button
         
+        //GUI Initialization
+        GuiGlobals.initialize(this);
+        BaseStyles.loadGlassStyle();
+        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
+        // Create a simple container for our elements
+        Container myWindow = new Container();
+        guiNode.attachChild(myWindow);
+
+        // Put it somewhere that we will see it.
+        // Note: Lemur GUI elements grow down from the upper left corner.
+        myWindow.setLocalTranslation(0, RES_HEIGHT, 0);
+
+        // Add some elements
+        Label lbl = new Label("Hello World");
+        lbl.setFontSize(50);
+
+        myWindow.addChild(lbl);
+
         initKeys();
     }
 

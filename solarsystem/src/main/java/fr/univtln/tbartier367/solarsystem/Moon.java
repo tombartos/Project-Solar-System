@@ -1,14 +1,16 @@
 package fr.univtln.tbartier367.solarsystem;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Line;
+
+//Imports for drawTrajectory
+//import com.jme3.scene.shape.Line;
+//import com.jme3.material.Material;
+//import com.jme3.material.RenderState;
+//import com.jme3.math.Vector3f;
+//import com.jme3.scene.Geometry;
 
 
 public class Moon extends Planet {
@@ -56,7 +58,7 @@ public class Moon extends Planet {
         return;
     }
 
-    //TODO: make it work properly (with update every frame ?)
+    //TODO: make it works properly (with update every frame ?)
 
     // public void drawTrajectory(Node rootNode, AssetManager assetManager){
     //     float centerX = attachedPlanet.x; // Direct access for better performance
