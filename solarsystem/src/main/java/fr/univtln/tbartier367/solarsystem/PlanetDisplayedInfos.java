@@ -9,8 +9,20 @@ public class PlanetDisplayedInfos {
     private String name;
     private float weight;
     private float equatorialRadius;
-    private Long volume;
+    private float volume;
     private float gravity;
     private float rotationSpeed;
-    private float pressure;    
+    private float pressure;
+    
+    @Override
+    public String toString() {
+        String res = "Name : " + name + "\n" + 
+        "Weight : " + weight + " kg\n" +
+        "Equatorial Radius : " + equatorialRadius + " km\n" +
+        "Volume : " + volume + " km3\n" +
+        "Gravity : " + gravity + " m/s2\n" + 
+        "Rotation Speed : " + rotationSpeed + " km/h\n" +
+        "Atmospheric Pressure : " + pressure + " hPa";
+        return res;
+    }
 }
