@@ -43,6 +43,11 @@ public class App extends SimpleApplication {
     private static Geometry sunSpatial;
     private static Spatial Saturn_Rings;
     private static BitmapText speedText;
+    private static BitmapText timeText;
+    private static int seconds = 0;
+    private static int minutes = 0;
+    private static int hours = 0;
+    private static int days = 0;
     private static boolean showTrajectories = true;
     private static ChaseCamera chaseCam;
     private static Node planets = new Node();
@@ -125,10 +130,18 @@ public class App extends SimpleApplication {
         setDisplayStatView(false);
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         speedText= new BitmapText(guiFont);
-        speedText.setSize(guiFont.getCharSet().getRenderedSize());
+        speedText.setSize(guiFont.getCharSet().getRenderedSize()+20);
         speedText.setText("Speed : "+time_multiplier);
         speedText.setLocalTranslation(300, speedText.getLineHeight(), 0);
         guiNode.attachChild(speedText);
+        
+        timeText = new BitmapText(guiFont);
+        timeText.setSize(guiFont.getCharSet().getRenderedSize()+20);
+        timeText.setText("Time elapsed : " + days + " days, "+ hours + ":" + minutes + ":" + seconds);
+        timeText.setLocalTranslation(1000, timeText.getLineHeight(), 0);
+        guiNode.attachChild(timeText);
+
+
 
          // Sky texture using six images
         Spatial sky = SkyFactory.createSky(
@@ -384,8 +397,13 @@ public class App extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
       // Update the time parameter (this is in seconds)
+      System.out.println(tpf);
       time +=  tpf*time_multiplier;
-      //System.out.println(time);
+      seconds = (int) (time%60);
+      minutes = (int) ((time/60)%60);
+      hours = (int) ((time/3600)%24);
+      days = (int) (time/86400);
+      timeText.setText("Time elapsed : " + days + " days, "+ hours + ":" + minutes + ":" + seconds);
 
       for (Planet p : Planet.getPlanetlist()) {
         p.UpdatePosition(time/31536000 *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre (en secondes) pour des multiplicateurs x1 sur la terre
