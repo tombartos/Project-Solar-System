@@ -1,5 +1,4 @@
 # Project Solar System
-Ce projet réalisé dans le cadre du cours de Vision par ordinateur vise à prendre en main le moteur Jmonkey en Java
-
+This project was made as an introduction to the JmonkeyEngine in Java, it's a small simulation of the solar system.
 ## Ressources
-Pour compiler le projet vous devez télécharger les ressources ici https://drive.google.com/file/d/1qevzFTtLLVGpQ6a4AG5bnGXWMkVqvfHd/view?usp=sharing et les mettre dans Project-Solar-System/solarsystem/src/main
+To compile the project you need to download the resources here https://drive.google.com/file/d/1qevzFTtLLVGpQ6a4AG5bnGXWMkVqvfHd/view?usp=sharing and put them in Project-Solar-System/solarsystem/src/main/resources
