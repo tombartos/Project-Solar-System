@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.TextureKey;
 import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
@@ -92,7 +93,8 @@ public class App extends SimpleApplication {
 
     /**
     * Initializes the Kuiper Belt
-    * 
+    * @param assetManager The Asset Manager of the project
+    * @param rootNode The Node where the asteroids will be creates, usually rootNode
     * @param semi_minor The semi minor axis of the belt
     * @param semi_major The semi major axis of the belt
     */
@@ -105,7 +107,8 @@ public class App extends SimpleApplication {
             asteroids_mat.setColor("Ambient", ColorRGBA.White);   
             asteroids_mat.setColor("Diffuse", ColorRGBA.White);   
             asteroids_mat.setColor("Specular", ColorRGBA.White);
-            asteroids_mat.setTexture("DiffuseMap", assetManager.loadTexture("/Textures/asteroids.jpeg"));
+            TextureKey key = new TextureKey("/Textures/asteroids.jpeg", true);
+            asteroids_mat.setTexture("DiffuseMap", assetManager.loadTexture(key));
             
             List<Spatial> asteroids_list = new ArrayList<>();         //We make a list to avoid losing access to asteroids
             for(float i = 0; i<2*Math.PI; i+=0.04f){
@@ -231,11 +234,16 @@ public class App extends SimpleApplication {
 
         //Rings of Saturn, there is a problem with the texture loading
         Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
-        Material mat_Saturn_Rings = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        Material mat_Saturn_Rings = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        mat_Saturn_Rings.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
+        mat_Saturn_Rings.setColor("Ambient", ColorRGBA.White);   // ... color of this object
+        mat_Saturn_Rings.setColor("Diffuse", ColorRGBA.White);   // ... color of light being reflected
+        mat_Saturn_Rings.setColor("Specular", ColorRGBA.White);
         mat_Saturn_Rings.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off); // Make the rings double-sided
-        mat_Saturn_Rings.setTexture("ColorMap", assetManager.loadTexture("Textures/rings.png"));
+        mat_Saturn_Rings.setTexture("DiffuseMap", assetManager.loadTexture("Textures/rings.png"));
         Saturn_Rings.setMaterial(mat_Saturn_Rings);
         Saturn_Rings.setLocalScale(8f);
+        Saturn_Rings.rotate(0f, 0f, 50f);
         rootNode.attachChild(Saturn_Rings);
 
         //Trajectory lines for planets
@@ -270,7 +278,7 @@ public class App extends SimpleApplication {
         chaseCam.setDefaultDistance(500);
         chaseCam.setMaxDistance(4000);
         chaseCam.setDefaultHorizontalRotation(-FastMath.PI/2);
-        chaseCam.setMinVerticalRotation(-FastMath.PI/2-0.01f);
+        chaseCam.setMinVerticalRotation(-FastMath.PI/2+0.01f);
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); // Only right mouse button
         
         //GUI Initialization
@@ -388,16 +396,17 @@ public class App extends SimpleApplication {
         }
     };
 
-    final private AnalogListener analogListener = new AnalogListener() {
-        @Override
-        public void onAnalog(String name, float value, float tpf) {
-            }
-    };
+    //  The Analog Listener is not used at the moment
+    //
+    // final private AnalogListener analogListener = new AnalogListener() {
+    //     @Override
+    //     public void onAnalog(String name, float value, float tpf) {
+    //         }
+    // };
 
     @Override
     public void simpleUpdate(float tpf) {
       // Update the time parameter (this is in seconds)
-      System.out.println(tpf);
       time +=  tpf*time_multiplier;
       seconds = (int) (time%60);
       minutes = (int) ((time/60)%60);
@@ -406,8 +415,8 @@ public class App extends SimpleApplication {
       timeText.setText("Time elapsed : " + days + " days, "+ hours + ":" + minutes + ":" + seconds);
 
       for (Planet p : Planet.getPlanetlist()) {
-        p.UpdatePosition(time/31536000 *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre (en secondes) pour des multiplicateurs x1 sur la terre
-        p.getSpatial().rotate(0, p.getRotationSpeed()*tpf*time_multiplier/86400, 0);
+        p.UpdatePosition(time/31536000 * 2*FastMath.PI *p.getRevolutionSpeed(), Saturn_Rings);  //Constantes basees sur la terre (en secondes) pour des multiplicateurs x1 sur la terre
+        p.getSpatial().rotate(0, p.getRotationSpeed() *2*FastMath.PI *tpf*time_multiplier/86400, 0);
         }
     }
 }
