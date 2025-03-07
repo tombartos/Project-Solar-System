@@ -295,8 +295,22 @@ public class App extends SimpleApplication {
 
         // Add some elements
         lbl = new Label(sunInfo);
-        lbl.setFontSize(50);
+        lbl.setFontSize(40);
         myWindow.addChild(lbl);
+
+        Container myWindow2 = new Container();
+        guiNode.attachChild(myWindow2);
+        //myWindow2.setLocalTranslation(1700,250,0);
+        myWindow2.setLocalTranslation(RES_WIDTH-RES_WIDTH/8, RES_HEIGHT/5, 0);
+        Label lbl_controls = new Label("Controls :\n"+
+                                        "P: Time Faster\n"+
+                                        "O: Time Slower\n"+
+                                        "T: Show Tajectories\n"+
+                                        "R_Click: Rotate\n"+
+                                        "L_Click: Focus on planet\n"+
+                                        "ESC: Quit\n");
+        lbl_controls.setFontSize(20);
+        myWindow2.addChild(lbl_controls);
 
         initKeys();
     }
