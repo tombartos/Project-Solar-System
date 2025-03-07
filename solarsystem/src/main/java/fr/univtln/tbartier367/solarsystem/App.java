@@ -36,9 +36,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
 
 public class App extends SimpleApplication {
     private static final int RES_WIDTH = 1920;
