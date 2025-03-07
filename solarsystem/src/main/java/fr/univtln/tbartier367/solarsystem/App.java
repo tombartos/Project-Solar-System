@@ -237,7 +237,6 @@ public class App extends SimpleApplication {
 
 
         //Rings of Saturn, there is a problem with the texture loading
-        //Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
         Torus torus = new Torus(20, 20, 4, 32);
         Saturn_Rings = new Geometry("rings", torus);
 
