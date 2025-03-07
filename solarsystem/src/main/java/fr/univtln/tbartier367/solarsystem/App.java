@@ -16,12 +16,15 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.scene.shape.Torus;
 import com.jme3.system.AppSettings;
+import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.GuiGlobals;
@@ -33,6 +36,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 
@@ -42,7 +46,7 @@ public class App extends SimpleApplication {
     private static Long time_multiplier = 1L;
     private static Float time = 0f;
     private static Geometry sunSpatial;
-    private static Spatial Saturn_Rings;
+    private static Geometry Saturn_Rings;
     private static BitmapText speedText;
     private static BitmapText timeText;
     private static int seconds = 0;
@@ -233,17 +237,25 @@ public class App extends SimpleApplication {
 
 
         //Rings of Saturn, there is a problem with the texture loading
-        Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
+        //Saturn_Rings = assetManager.loadModel("Models/rings.j3o");
+        Torus torus = new Torus(20, 20, 4, 32);
+        Saturn_Rings = new Geometry("rings", torus);
+
         Material mat_Saturn_Rings = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         mat_Saturn_Rings.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
         mat_Saturn_Rings.setColor("Ambient", ColorRGBA.White);   // ... color of this object
         mat_Saturn_Rings.setColor("Diffuse", ColorRGBA.White);   // ... color of light being reflected
         mat_Saturn_Rings.setColor("Specular", ColorRGBA.White);
         mat_Saturn_Rings.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off); // Make the rings double-sided
-        mat_Saturn_Rings.setTexture("DiffuseMap", assetManager.loadTexture("Textures/rings.png"));
+        mat_Saturn_Rings.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        //Saturn_Rings.setQueueBucket(Bucket.Transparent);
+        Texture rings_tex = assetManager.loadTexture("Textures/rings.png");
+        rings_tex.setWrap(Texture.WrapMode.Repeat);
+        mat_Saturn_Rings.setTexture("DiffuseMap", rings_tex);
         Saturn_Rings.setMaterial(mat_Saturn_Rings);
-        Saturn_Rings.setLocalScale(8f);
-        Saturn_Rings.rotate(0f, 0f, 50f);
+        // Saturn_Rings.setLocalScale(8f);
+        Saturn_Rings.rotate(-FastMath.PI/2, 0f, 0.0001f);
+        Saturn_Rings.setLocalScale(1f, 1f, 0.01f);
         rootNode.attachChild(Saturn_Rings);
 
         //Trajectory lines for planets
